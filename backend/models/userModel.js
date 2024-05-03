@@ -1,6 +1,6 @@
+// user registration model & validation infos
 const mongoose = require('mongoose');
 
-// user model containing validating infos
 const userSchema = mongoose.Schema({
     name: {
         type: String,

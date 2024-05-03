@@ -3,13 +3,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const userRoute = require('./routes/userRoute');
 
 const app = express();
 
 // Middlewares
 app.use(express.json());        // help handle json data
 app.use(express.urlencoded({extended: false}))  // handle data via url
-app.use(bodyParser.json()); 
+app.use(bodyParser.json());
+
+// Routes Middleware - for user registration
+app.use("/api/users", userRoute)
 
 // Routes 
 app.get("/", (req, res) => {
