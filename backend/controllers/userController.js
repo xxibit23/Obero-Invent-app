@@ -1,5 +1,10 @@
+// User register function
 const registerUser = async (req, res) => {
-    res.send("Register User")
+    try {
+        
+    } catch (err) {
+        
+    }
 }
 
 // export user controller functions
