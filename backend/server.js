@@ -5,13 +5,16 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const userRoute = require('./routes/userRoute');
 const errorHandler = require('./middleWare/errorMiddleware');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 // Middlewares
 app.use(express.json());        // help handle json data
+app.use(cookieParser());        // to help store user token
 app.use(express.urlencoded({extended: false}))  // handle data via url
 app.use(bodyParser.json());
+app.use(cors());
 
 // Routes Middleware - for user registration
 app.use("/api/users", userRoute)

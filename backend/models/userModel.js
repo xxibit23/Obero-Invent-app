@@ -1,5 +1,7 @@
 // user registration model & validation infos
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
 
 const userSchema = mongoose.Schema({
     name: {
@@ -20,7 +22,7 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, "Please add a password"],
         minLength: [6, "Password must be 6 characters or more"],
-        maxLength: [20, "Password can't more than 20 characters"],
+        // maxLength: [20, "Password can't more than 20 characters"],
     },
     photo: {
         type: String,
@@ -40,5 +42,17 @@ const userSchema = mongoose.Schema({
     timestamps: true,
 })
 
+// Encrypt password with bcrypt before saving into db
+userSchema.pre("save", async function(next){ 
+    if(!this.isModified("password")){    // but if password is !modified, skip bcrypt to next operation
+        return next();
+    }
+    
+    // hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(this.password, salt);
+    this.password = hashedPassword;
+    next();
+})
 const User = mongoose.model('User', userSchema);
 module.exports = User;
