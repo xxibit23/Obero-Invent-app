@@ -16,7 +16,7 @@ app.use(express.urlencoded({extended: false}))  // handle data via url
 app.use(bodyParser.json());
 app.use(cors());
 
-// Routes Middleware - for user registration
+// Routes Middleware - for user route functions
 app.use("/api/users", userRoute)
 
 // Routes 

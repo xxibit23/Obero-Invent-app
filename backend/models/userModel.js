@@ -42,6 +42,7 @@ const userSchema = mongoose.Schema({
     timestamps: true,
 })
 
+
 // Encrypt password with bcrypt before saving into db
 userSchema.pre("save", async function(next){ 
     if(!this.isModified("password")){    // but if password is !modified, skip bcrypt to next operation
