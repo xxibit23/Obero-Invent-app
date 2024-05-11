@@ -1,7 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser } = require('../controllers/userController');
+const { registerUser, loginUser, logout, getUser, loginStatus, updateUser } = require('../controllers/userController');
+const protect = require('../middleWare/authMiddleware');
 
-router.post("/register", registerUser); // trigger 'registerUser' f(x) in controller folder when a post request is made to register page
+// trigger 'user' functions in controller folder when a post request is made to register page
+router.post("/register", registerUser);
 router.post("/login", loginUser);
-module.exports = router;
+router.get("/logout", logout);
+router.get("/getuser", protect, getUser);
+router.get("/logged-in", loginStatus);
+router.patch("/updateuser", protect, updateUser);
+
+module.exports = router;    

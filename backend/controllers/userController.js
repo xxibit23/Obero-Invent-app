@@ -8,7 +8,7 @@ const generateToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: "1d"})
 } 
 
-//  Register User function
+//  REGISTER User function
 const registerUser = asyncHandler( async (req, res) => {
     const {name, email, password} = req.body;
 
@@ -39,7 +39,7 @@ const registerUser = asyncHandler( async (req, res) => {
     // execute generate user token
     const token = generateToken(user._id)
 
-    // Send hTTP-only cookie of the token after creating user
+    // Send HTTP-only cookie of the token after creating user
     res.cookie("token", token, {
         path: "/",          // cookie path 
         httpOnly: true,     // make cookie accessibly only by the web server
@@ -65,7 +65,7 @@ const registerUser = asyncHandler( async (req, res) => {
     }
 });
 
-// Login user function 
+// LOGIN user function 
 const loginUser = asyncHandler( async (req, res) => {
     
     const {email, password} = req.body;
@@ -88,7 +88,7 @@ const loginUser = asyncHandler( async (req, res) => {
     // execute generate user token
     const token = generateToken(user._id)
 
-    // Send hTTP-only cookie of the token after creating user
+    // Send hTTP-only cookie of the token after loging in user
     res.cookie("token", token, {
         path: "/",          // cookie path 
         httpOnly: true,     // make cookie accessibly only by the web server
@@ -114,8 +114,66 @@ const loginUser = asyncHandler( async (req, res) => {
     }
 })
 
+// LOGOUT user function
+const logout = asyncHandler( async (req, res) => {
+    // Expire the cookie to destroy user session
+    res.cookie("token", "", {
+        path: "/",          
+        httpOnly: true,    
+        expires: new Date(0),   // set day to 0 to expire the cookie
+        sameSite: "none",
+        secure: true 
+    })
+    return res.status(200).json({
+        message: "Logged out"
+    });
+})
+
+// Get user data --- if user is logged in ---
+const getUser = asyncHandler( async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        const {_id, name, email, phone, photo, bio} = user
+        res.status(200).json({
+            _id,
+            name,
+            email,
+            phone,
+            photo,
+            bio
+        })
+    } else {
+        res.status(400);
+        throw new Error("User not found");
+    }
+});
+
+// Return bool login status, using the cookie token
+const loginStatus = asyncHandler( async (req, res) => {
+    const token = req.cookies.token;
+    if (!token) {
+        return res.json(false);    // false for  user !logged-in
+    } 
+    
+    // Verify token
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if (verified) {
+        return res.json(true);   // true for user is logged-in
+    }
+    return res.json(false);
+})
+
+// Update User
+const updateUser = asyncHandler( async (req, res) => {
+    res.send("User updated")
+})
 // export user controller functions
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    logout,
+    getUser,
+    loginStatus,
+    updateUser,
 }
