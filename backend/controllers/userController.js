@@ -5,6 +5,7 @@ const User = require('../models/userModel');
 const Token = require('../models/tokenModel');
 const crypto = require('crypto');
 const sendEmail = require('../utils/sendEmail');
+const { log } = require('console');
 
 
 // Generate a token with jsonwebtoken for logged-in user
@@ -65,7 +66,7 @@ const registerUser = asyncHandler( async (req, res) => {
         })
     } else {
         res.status(400);
-        throw new Error("Invalid user data");
+        throw new Error("Error getting user data");
     }
 });
 
@@ -245,7 +246,7 @@ const forgotPassword = asyncHandler( async (req, res) => {
 
     // Create reset token
     let resetToken = crypto.randomBytes(32).toString("hex") + user._id      //  unique reset token
-
+    console.log(resetToken)
     // Hash token before saving to db   --- using sha256 algorithm ---
     const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
     
@@ -287,6 +288,36 @@ const forgotPassword = asyncHandler( async (req, res) => {
     }
 })
 
+// RESET password
+const resetPassword = asyncHandler( async (req, res) => {
+    const {password} = req.body;
+    const {resetToken} = req.params;
+    
+    // Hash token, then compare with Token in db 
+    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+    // Find Token in db
+    const userToken = await Token.findOne({
+        token: hashedToken, 
+        expiresAt: {$gt: Date.now()}
+    })
+
+    if (!userToken) {
+        res.status(404);
+        throw new Error("Invalid or Expired Token")
+    }
+
+    // Find user based on userId in Token collection
+    const user = await User.findOne({_id: userToken.userId});
+    user.password = password;
+    await user.save();
+    res.status(200).json({
+        message: "Password reset successful. Please Login"
+    })
+
+
+});
+
 // export user controller functions
 module.exports = {
     registerUser,
@@ -297,4 +328,5 @@ module.exports = {
     updateUser,
     changePassword,
     forgotPassword,
+    resetPassword,
 }
