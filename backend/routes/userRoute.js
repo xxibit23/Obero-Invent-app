@@ -12,6 +12,6 @@ router.get("/logged-in", loginStatus);
 router.patch("/updateuser", protect, updateUser);   // patch helps partially update our user details 
 router.patch("/changepassword", protect, changePassword);
 router.post("/forgotpassword", forgotPassword);
-router.put("/resetpassword/:resetToken", resetPassword);
+router.put("/resetpassword/:resetToken", resetPassword);    
 
 module.exports = router;    

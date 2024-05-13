@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
 // Function to check if user is logged in before taken to profile page
-// Is included in 'getUser' router in userRouter
+// Is included in 'getUser' router in userRouter & others
 const protect = asyncHandler( async (req, res, next) => {
     try {
         const token = req.cookies.token
@@ -14,7 +14,7 @@ const protect = asyncHandler( async (req, res, next) => {
         
         // If there is token, Verify it
         const verified = jwt.verify(token, process.env.JWT_SECRET)
-        // Get user id from token
+        // Get user id from db using id from Token
         const user = await User.findById(verified.id).select("-password");  // exclude password from db result
         if (!user) {
             res.status(404);
